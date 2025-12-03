@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@heroui/react'
 import { ThumbsUp, ThumbsDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -89,12 +89,25 @@ export function VoteButtons({
   }
 
   return (
-    <div className={cn('flex items-center gap-2', compact && 'gap-1')}>
+    <div className={cn('flex items-center gap-2', compact && 'gap-1.5')}>
       <Button
         size={compact ? 'sm' : 'md'}
-        variant={userVote === 'up' ? 'solid' : 'flat'}
-        color={userVote === 'up' ? 'success' : 'default'}
-        startContent={<ThumbsUp size={compact ? 16 : 18} />}
+        variant="flat"
+        className={cn(
+          'transition-all duration-300 font-medium',
+          userVote === 'up'
+            ? 'bg-success/20 text-success border-success/30 shadow-[0_4px_15px_rgba(34,197,94,0.2)]'
+            : 'bg-default-100/50 text-default-600 hover:bg-success/10 hover:text-success border-transparent hover:border-success/20'
+        )}
+        startContent={
+          <ThumbsUp 
+            size={compact ? 14 : 16} 
+            className={cn(
+              'transition-transform',
+              userVote === 'up' && 'scale-110'
+            )} 
+          />
+        }
         onClick={() => handleVote('up')}
         isDisabled={loading}
       >
@@ -102,9 +115,22 @@ export function VoteButtons({
       </Button>
       <Button
         size={compact ? 'sm' : 'md'}
-        variant={userVote === 'down' ? 'solid' : 'flat'}
-        color={userVote === 'down' ? 'danger' : 'default'}
-        startContent={<ThumbsDown size={compact ? 16 : 18} />}
+        variant="flat"
+        className={cn(
+          'transition-all duration-300 font-medium',
+          userVote === 'down'
+            ? 'bg-danger/20 text-danger border-danger/30 shadow-[0_4px_15px_rgba(239,68,68,0.2)]'
+            : 'bg-default-100/50 text-default-600 hover:bg-danger/10 hover:text-danger border-transparent hover:border-danger/20'
+        )}
+        startContent={
+          <ThumbsDown 
+            size={compact ? 14 : 16}
+            className={cn(
+              'transition-transform',
+              userVote === 'down' && 'scale-110'
+            )}
+          />
+        }
         onClick={() => handleVote('down')}
         isDisabled={loading}
       >
@@ -113,4 +139,3 @@ export function VoteButtons({
     </div>
   )
 }
-

@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardBody, CardHeader } from '@heroui/react'
-import { Users, FileText, MessageCircle, TrendingUp } from 'lucide-react'
+import { Users, FileText, MessageCircle, TrendingUp, Shield, ArrowLeft, ThumbsUp } from 'lucide-react'
 import type { Profile } from '@/types/database.types'
+import Link from 'next/link'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -60,127 +61,182 @@ export default async function AdminPage() {
       title: '总用户数',
       value: totalUsers || 0,
       icon: Users,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50',
+      gradient: 'from-blue-500 to-cyan-400',
+      bgGradient: 'from-blue-500/10 to-cyan-400/10',
+      iconColor: 'text-blue-500',
     },
     {
       title: '总想法数',
       value: totalIdeas || 0,
       icon: FileText,
-      color: 'text-green-500',
-      bgColor: 'bg-green-50',
+      gradient: 'from-green-500 to-emerald-400',
+      bgGradient: 'from-green-500/10 to-emerald-400/10',
+      iconColor: 'text-green-500',
     },
     {
       title: '总评论数',
       value: totalComments || 0,
       icon: MessageCircle,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50',
+      gradient: 'from-purple-500 to-pink-400',
+      bgGradient: 'from-purple-500/10 to-pink-400/10',
+      iconColor: 'text-purple-500',
     },
     {
       title: '总投票数',
       value: totalVotes || 0,
       icon: TrendingUp,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-50',
+      gradient: 'from-accent-primary to-accent-tertiary',
+      bgGradient: 'from-accent-primary/10 to-accent-tertiary/10',
+      iconColor: 'text-accent-primary',
     },
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-8">超级管理员面板</h1>
+    <div className="min-h-screen py-8">
+      {/* 装饰背景 */}
+      <div className="fixed inset-0 hero-pattern grid-pattern opacity-30 pointer-events-none"></div>
 
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-default-500 mb-1">{stat.title}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+      <div className="container mx-auto px-4 max-w-7xl relative z-10">
+        {/* 返回按钮 */}
+        <Link 
+          href="/"
+          className="inline-flex items-center gap-2 text-default-500 hover:text-accent-primary mb-6 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          返回首页
+        </Link>
+
+        {/* 页面标题 */}
+        <div className="flex items-center gap-4 mb-8 animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-tertiary flex items-center justify-center shadow-glow-accent">
+            <Shield className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">管理面板</h1>
+            <p className="text-default-500 text-sm">查看和管理平台数据</p>
+          </div>
+        </div>
+
+        {/* 统计卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <Card 
+              key={stat.title}
+              className="bg-background/70 backdrop-blur-xl border border-default-200/50 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardBody className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-default-500 mb-1">{stat.title}</p>
+                    <p className={`text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${stat.bgGradient}`}>
+                    <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
+                  </div>
                 </div>
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={stat.color} size={24} />
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+
+        {/* 最近的想法和用户 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 最近的想法 */}
+          <Card className="bg-background/70 backdrop-blur-xl border border-default-200/50 shadow-soft animate-fade-in-up delay-200">
+            <CardHeader className="p-6 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-400/20 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-green-500" />
                 </div>
+                <h2 className="text-xl font-bold">最近的想法</h2>
               </div>
+            </CardHeader>
+            <CardBody className="p-6 pt-0">
+              {recentIdeas && recentIdeas.length > 0 ? (
+                <div className="space-y-3">
+                  {recentIdeas.map((idea: any) => (
+                    <div 
+                      key={idea.id} 
+                      className="p-3 rounded-xl hover:bg-default-100/50 transition-colors border-b border-default-100 last:border-b-0"
+                    >
+                      <Link
+                        href={`/ideas/${idea.id}`}
+                        className="font-medium hover:text-accent-primary line-clamp-1 transition-colors"
+                      >
+                        {idea.title}
+                      </Link>
+                      <div className="flex items-center gap-3 text-xs text-default-500 mt-1.5">
+                        <span className="font-medium">{idea.author_username || '匿名用户'}</span>
+                        <span className="text-default-300">·</span>
+                        <span>{new Date(idea.created_at).toLocaleDateString('zh-CN')}</span>
+                        <span className="text-default-300">·</span>
+                        <span className="flex items-center gap-1">
+                          <ThumbsUp className="w-3 h-3" /> {idea.upvotes}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageCircle className="w-3 h-3" /> {idea.comment_count}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-default-500">
+                  <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>暂无数据</p>
+                </div>
+              )}
             </CardBody>
           </Card>
-        ))}
-      </div>
 
-      {/* 最近的想法和用户 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 最近的想法 */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-bold">最近的想法</h2>
-          </CardHeader>
-          <CardBody>
-            {recentIdeas && recentIdeas.length > 0 ? (
-              <div className="space-y-3">
-                {recentIdeas.map((idea: any) => (
-                  <div key={idea.id} className="border-b pb-3 last:border-b-0">
-                    <a
-                      href={`/ideas/${idea.id}`}
-                      className="font-medium hover:text-primary line-clamp-1"
-                    >
-                      {idea.title}
-                    </a>
-                    <div className="flex items-center gap-2 text-xs text-default-500 mt-1">
-                      <span>{idea.author_username || '匿名用户'}</span>
-                      <span>·</span>
-                      <span>{new Date(idea.created_at).toLocaleDateString('zh-CN')}</span>
-                      <span>·</span>
-                      <span>
-                        👍 {idea.upvotes} · 💬 {idea.comment_count}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+          {/* 最近的用户 */}
+          <Card className="bg-background/70 backdrop-blur-xl border border-default-200/50 shadow-soft animate-fade-in-up delay-300">
+            <CardHeader className="p-6 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-400/20 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-blue-500" />
+                </div>
+                <h2 className="text-xl font-bold">最近注册的用户</h2>
               </div>
-            ) : (
-              <p className="text-center text-default-500">暂无数据</p>
-            )}
-          </CardBody>
-        </Card>
-
-        {/* 最近的用户 */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-bold">最近注册的用户</h2>
-          </CardHeader>
-          <CardBody>
-            {recentUsers && recentUsers.length > 0 ? (
-              <div className="space-y-3">
-                {recentUsers.map((user: any) => (
-                  <div key={user.id} className="border-b pb-3 last:border-b-0">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Users size={16} />
+            </CardHeader>
+            <CardBody className="p-6 pt-0">
+              {recentUsers && recentUsers.length > 0 ? (
+                <div className="space-y-3">
+                  {recentUsers.map((u: any) => (
+                    <div 
+                      key={u.id} 
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-default-100/50 transition-colors border-b border-default-100 last:border-b-0"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-primary/20 to-accent-tertiary/20 flex items-center justify-center flex-shrink-0">
+                        <Users className="w-5 h-5 text-accent-primary" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{user.username || '未设置用户名'}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{u.username || '未设置用户名'}</p>
                         <p className="text-xs text-default-500">
-                          {new Date(user.created_at).toLocaleDateString('zh-CN')}
+                          {new Date(u.created_at).toLocaleDateString('zh-CN')}
                         </p>
                       </div>
-                      {user.role === 'super_admin' && (
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                      {u.role === 'super_admin' && (
+                        <span className="text-xs bg-accent-primary/10 text-accent-primary px-2.5 py-1 rounded-full font-medium border border-accent-primary/20">
                           管理员
                         </span>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-default-500">暂无数据</p>
-            )}
-          </CardBody>
-        </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-default-500">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>暂无数据</p>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        </div>
       </div>
     </div>
   )
 }
-
